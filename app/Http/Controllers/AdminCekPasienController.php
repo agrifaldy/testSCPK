@@ -200,9 +200,9 @@ class AdminCekPasienController extends Controller
 
         $ztotal = ($a1*$z1 + $a2*$z2 + $a3*$z3 + $a4*$z4 + $a5*$z5 + $a6*$z6 /*+ $a7*$z7*/)/($a1 + $a2 + $a3 + $a4 + $a5 + $a6 /*+ $a7*/);
 
-        dd($ztotal);
+        //dd($ztotal);
 
-        if ($ztotal > 83.108734402853 ) {
+        if ($ztotal < 145.59588394062 ) {
             CekPasien::create(['result_pasien' => 'Diberi pengobatan',
                 'pasien_id' => $request->pasien_id,
                 'tekanan_darah_sistolik' => $request->tekanan_darah_sistolik,
@@ -214,7 +214,7 @@ class AdminCekPasienController extends Controller
                 'asam_urat' => $request->asam_urat,
                 'id_uniq' => $request->id_uniq,
                 'z' => $ztotal]);
-        }else if ($ztotal == 83.108734402852 ) {
+        }else if ($ztotal >= 145.59588394062 ) {
         CekPasien::create(['result_pasien' => 'Perlu dirujuk',
             'pasien_id' => $request->pasien_id,
             'tekanan_darah_sistolik' => $request->tekanan_darah_sistolik,
@@ -227,7 +227,7 @@ class AdminCekPasienController extends Controller
             'id_uniq' => $request->id_uniq,
             'z' => $ztotal]);
          }
-        else  {
+        /**else  {
             CekPasien::create(['result_pasien' => 'Perlu dirujuk',
                 'pasien_id' => $request->pasien_id,
                 'tekanan_darah_sistolik' => $request->tekanan_darah_sistolik,
@@ -239,7 +239,7 @@ class AdminCekPasienController extends Controller
                 'asam_urat' => $request->asam_urat,
                 'id_uniq' => $request->id_uniq,
                 'z' => $ztotal]);
-        }
+        }**/
 
 
 
@@ -268,97 +268,75 @@ class AdminCekPasienController extends Controller
             if ($sistolik <= 120) {
                 $tekanan_darah_sistolik = "Rendah";
             }
-            if(sistolik -> tekanan_darah_sistolik > 120 and $request -> tekanan_darah_sistolik <= 180) {
+            if($sistolik > 120 and $sistolik < 180) {
                 $tekanan_darah_sistolik = "Sedang";
             }
-            if($request -> tekanan_darah_sistolik > 180) {
+            if($sistolik >= 180) {
                 $tekanan_darah_sistolik = "Tinggi";
             }
-            $x1 = $request->tekanan_darah_sistolik;
-            $a1 = ($x1 - 160) / (180-160);
-            $z1 = $x1 - (1*$a1);
-
         }
 
-        if ($request -> tekanan_darah_diastolik) {
-            if ($request -> tekanan_darah_diastolik <= 80) {
+        if ($diastolik) {
+            if ($diastolik <= 80) {
                 $tekanan_darah_diastolik = "Rendah";
             }
-            if($request -> tekanan_darah_diastolik > 80 and $request -> tekanan_darah_diastolik <= 110) {
+            if($diastolik > 80 and $diastolik <= 110) {
                 $tekanan_darah_diastolik = "Sedang";
             }
-            if($request -> tekanan_darah_diastolik > 110) {
+            if($diastolik > 110) {
                 $tekanan_darah_diastolik = "Tinggi";
             }
-            $x2 = $request->tekanan_darah_diastolik;
-            $a2 = ($x2 - 100) / (110-100);
-            $z2 = (($x2) - (1*$a2));
-
         }
 
-        if ($request -> suhu_tubuh) {
-            if ($request -> suhu_tubuh < 36) {
+        if ($suhu) {
+            if ($suhu < 36) {
                 $suhu_tubuh = "Rendah";
             }
-            if($request -> suhu_tubuh >= 36 and $request -> suhu_tubuh < 37.5) {
+            if($suhu >= 36 and $suhu < 37.5) {
                 $suhu_tubuh = "Sedang";
             }
-            if($request -> suhu_tubuh >= 37.5) {
+            if($suhu >= 37.5) {
                 $suhu_tubuh = "Tinggi";
             }
-            $x3 = $request->suhu_tubuh;
-            $a3 = ($x3 - 37) / (40-37);
-            $z3 = $x3 - (1*$a3);
         }
 
-        if ($request -> berat_badan) {
-            if ($request -> berat_badan < 30) {
+        if ($berat) {
+            if ($berat < 30) {
                 $berat_badan = "Ringan";
             }
-            if($request -> berat_badan >= 30 and $request -> berat_badan < 80) {
+            if($berat >= 30 and $berat < 80) {
                 $berat_badan = "Biasa";
             }
-            if($request -> berat_badan >= 80) {
+            if($berat >= 80) {
                 $berat_badan = "Berat";
             }
-            $x4 = $request->berat_badan;
-            $a4 = ($x4 - 60) / (80-60);
-            $z4 = $x4 - (1*$a4);
-
         }
 
-        if ($request -> kolesterol) {
-            if ($request -> kolesterol < 199) {
+        if ($koles) {
+            if ($koles < 199) {
                 $kolesterol = "Baik";
             }
-            if($request -> kolesterol >= 199 and $request -> kolesterol < 239) {
+            if($koles >= 199 and $koles < 239) {
                 $kolesterol = "Perbatasan";
             }
-            if($request -> kolesterol >= 239) {
+            if($koles >= 239) {
                 $kolesterol = "Bahaya";
             }
-            $x5 = $request->kolesterol;
-            $a5 = ($x5 - 220) / (240-220);
-            $z5 = $x5 - (1*$a5);
-
         }
 
-        if ($request -> asam_urat) {
-            if ($request -> asam_urat < 3.5) {
+        if ($asam) {
+            if ($asam < 3.5) {
                 $asam_urat = "Rendah";
             }
-            if($request -> asam_urat >= 3.5 and $request -> asam_urat < 7) {
+            if($asam >= 3.5 and $asam < 7) {
                 $asam_urat = "Normal";
             }
-            if($request -> asam_urat >= 7) {
+            if($asam >= 7) {
                 $asam_urat = "Tinggi";
             }
-            $x6 = $request->asam_urat;
-            $a6 = ($x6 - 7) / (8-7);
-            $z6 = $x6 - (1*$a6);
-
         }
 
+        if ($tinggi) {
             if ($tinggi < 130) {
                 $tinggi_badan = "Pendek";
             }
@@ -368,23 +346,17 @@ class AdminCekPasienController extends Controller
             if($tinggi >= 170) {
                 $tinggi_badan = "Tinggi";
             }
+        }
 
-
-
-
-
-        $ztotal = ($a1*$z1 + $a2*$z2 + $a3*$z3 + $a4*$z4 + $a5*$z5 + $a6*$z6 /*+ $a7*$z7*/)/($a1 + $a2 + $a3 + $a4 + $a5 + $a6 /*+ $a7*/);
-
-
-        return view('dashboard.cekpasien.indexDetail', ['cekPasien' => $cekPasien,
-                                                        'riwayat_penyakit' => $riwayat_penyakit,
-                                                        'tekanan_darah_sistolik' => $tekanan_darah_sistolik,
-                                                        'tekanan_darah_diastolik' => $tekanan_darah_diastolik,
-                                                        'suhu_tubuh' => $suhu_tubuh,
-                                                        'tinggi_badan' => $tinggi_badan,
-                                                        'berat_badan' => $berat_badan,
-                                                        'kolesterol' => $kolesterol,
-                                                        'asam_urat' => $asam_urat,
-                                                        'z' => $z]);
+        return view('dashboard.cekpasien.indexDetail', compact('cekPasien',
+                                                            'riwayat_penyakit',
+                                                                'sistolik',
+                                                                'diastolik',
+                                                                'suhu',
+                                                                'tinggi',
+                                                                'berat_badan' ,
+                                                                'kolesterol' ,
+                                                                'asam_urat' ,
+                                                                'z'));
     }
 }
