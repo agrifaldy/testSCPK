@@ -6,6 +6,7 @@ use App\Pasien;
 use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Laravolt\Indonesia\Models\City;
 
 class AdminPasienController extends Controller
@@ -18,8 +19,14 @@ class AdminPasienController extends Controller
     public function index()
     {
         //
-        $pasiens = Pasien::all();
-        return view('dashboard.pasien.index', compact('pasiens'));
+        $user = Auth::user();
+
+        if ($user) {
+            $pasiens = Pasien::all();
+            return view('dashboard.pasien.index', compact('pasiens'));
+        }
+        return view('auth.login');
+
 
     }
 
@@ -31,8 +38,15 @@ class AdminPasienController extends Controller
     public function create()
     {
         //
-        $kota = City::all();
-        return view('dashboard.pasien.create', compact('kota'));
+        $user = Auth::user();
+
+        if ($user) {
+            $kota = City::all();
+            return view('dashboard.pasien.create', compact('kota'));
+        }
+        return view('auth.login');
+
+
     }
 
     /**

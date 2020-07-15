@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UserRequest;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AdminPetugasController extends Controller
@@ -17,8 +18,14 @@ class AdminPetugasController extends Controller
      */
     public function index()
     {
-        $users = User::all();
-        return view('dashboard.petugas.index', compact('users'));
+        $user = Auth::user();
+
+        if ($user) {
+            $users = User::all();
+            return view('dashboard.petugas.index', compact('users'));
+        }
+        return view('auth.login');
+
     }
 
     /**
@@ -84,8 +91,14 @@ class AdminPetugasController extends Controller
     public function edit($id)
     {
         //
-        $user =User::findOrFail($id);
-        return view('dashboard.petugas.edit', compact('user'));
+        $user = Auth::user();
+
+        if ($user) {
+            $user =User::findOrFail($id);
+            return view('dashboard.petugas.edit', compact('user'));
+        }
+        return view('auth.login');
+
 
     }
 

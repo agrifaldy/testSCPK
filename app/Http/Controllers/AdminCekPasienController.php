@@ -10,6 +10,7 @@ use App\Pasien;
 use App\Penyakit;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AdminCekPasienController extends Controller
@@ -18,19 +19,37 @@ class AdminCekPasienController extends Controller
     public function index()
     {
         //
-        $pasiens = Pasien::all();
-        $cekpasien= CekPasien::all();
-        return view('dashboard.cekpasien.index', compact('pasiens', 'cekpasien'));
+        $user = Auth::user();
+
+        if ($user) {
+            $pasiens = Pasien::all();
+            $cekpasien= CekPasien::all();
+            return view('dashboard.cekpasien.index', compact('pasiens', 'cekpasien'));
+        }
+        return view('auth.login');
+
+        $user = Auth::user();
+
+        if ($user) {
+
+        }
+        return view('auth.login');
 
     }
 
     public function edit($id)
     {
         //
-        $pasien = Pasien::findOrFail($id);
-        $penyakits = Penyakit::all();
-        $number = mt_rand(1, 99999);
-        return view('dashboard.cekpasien.create', compact('pasien', 'penyakits', 'number'));
+        $user = Auth::user();
+
+        if ($user) {
+            $pasien = Pasien::findOrFail($id);
+            $penyakits = Penyakit::all();
+            $number = mt_rand(1, 99999);
+            return view('dashboard.cekpasien.create', compact('pasien', 'penyakits', 'number'));
+        }
+        return view('auth.login');
+
     }
 
     public function update(Request $request, $id)
@@ -61,21 +80,19 @@ class AdminCekPasienController extends Controller
 
 
        if ($request -> tekanan_darah_sistolik) {
-           if ($request -> tekanan_darah_sistolik <= 80) {
+           if ($request -> tekanan_darah_sistolik <= 120) {
                $tekanan_darah_sistolik = "Rendah";
            }
-           if($request -> tekanan_darah_sistolik > 80 and $request -> tekanan_darah_sistolik <= 110) {
+           if($request -> tekanan_darah_sistolik > 120 and $request -> tekanan_darah_sistolik <= 180) {
                $tekanan_darah_sistolik = "Sedang";
            }
-           if($request -> tekanan_darah_sistolik > 110) {
+           if($request -> tekanan_darah_sistolik > 180) {
                $tekanan_darah_sistolik = "Tinggi";
            }
            $x1 = $request->tekanan_darah_sistolik;
            $a1 = ($x1 - 160) / (180-160);
-           $z1 = $x1 - (100*$a1);
-           if ($z1 < 0) {
-               $z1 = $z1 * -1;
-           }
+           $z1 = $x1 - (1*$a1);
+
        }
 
         if ($request -> tekanan_darah_diastolik) {
@@ -90,10 +107,8 @@ class AdminCekPasienController extends Controller
             }
             $x2 = $request->tekanan_darah_diastolik;
             $a2 = ($x2 - 100) / (110-100);
-            $z2 = (($x2) - (100*$a2));
-            if ($z2 < 0) {
-                $z2 = $z2 * -1;
-            }
+            $z2 = (($x2) - (1*$a2));
+
         }
 
         if ($request -> suhu_tubuh) {
@@ -108,10 +123,7 @@ class AdminCekPasienController extends Controller
             }
             $x3 = $request->suhu_tubuh;
             $a3 = ($x3 - 37) / (40-37);
-            $z3 = $x3 - (100*$a3);
-            if ($z3 < 0) {
-                $z3 = $z3 * -1;
-            }
+            $z3 = $x3 - (1*$a3);
         }
 
         if ($request -> berat_badan) {
@@ -126,28 +138,24 @@ class AdminCekPasienController extends Controller
             }
             $x4 = $request->berat_badan;
             $a4 = ($x4 - 60) / (80-60);
-            $z4 = $x4 - (100*$a4);
-            if ($z4 < 0) {
-                $z4 = $z4 * -1;
-            }
+            $z4 = $x4 - (1*$a4);
+
         }
 
         if ($request -> kolesterol) {
-            if ($request -> kolesterol < 36) {
+            if ($request -> kolesterol < 199) {
                 $kolesterol = "Baik";
             }
-            if($request -> kolesterol >= 36 and $request -> kolesterol < 37.5) {
+            if($request -> kolesterol >= 199 and $request -> kolesterol < 239) {
                 $kolesterol = "Perbatasan";
             }
-            if($request -> kolesterol >= 37.5) {
+            if($request -> kolesterol >= 239) {
                 $kolesterol = "Bahaya";
             }
             $x5 = $request->kolesterol;
             $a5 = ($x5 - 220) / (240-220);
-            $z5 = $x5 - (100*$a5);
-            if ($z5 < 0) {
-                $z5 = $z5 * -1;
-            }
+            $z5 = $x5 - (1*$a5);
+
         }
 
         if ($request -> asam_urat) {
@@ -162,10 +170,8 @@ class AdminCekPasienController extends Controller
             }
             $x6 = $request->asam_urat;
             $a6 = ($x6 - 7) / (8-7);
-            $z6 = $x6 - (100*$a6);
-            if ($z6 < 0) {
-                $z6 = $z6 * -1;
-            }
+            $z6 = $x6 - (1*$a6);
+
         }
 
 //        if ($jumlah) {
@@ -193,6 +199,8 @@ class AdminCekPasienController extends Controller
 //        }
 
         $ztotal = ($a1*$z1 + $a2*$z2 + $a3*$z3 + $a4*$z4 + $a5*$z5 + $a6*$z6 /*+ $a7*$z7*/)/($a1 + $a2 + $a3 + $a4 + $a5 + $a6 /*+ $a7*/);
+
+        dd($ztotal);
 
         if ($ztotal > 83.108734402853 ) {
             CekPasien::create(['result_pasien' => 'Diberi pengobatan',
@@ -255,7 +263,7 @@ class AdminCekPasienController extends Controller
         $koles = CekPasien::all()->where('id', '=', $id)->get('kolesterol');
         $asam = CekPasien::all()->where('id', '=', $id)->get('asam_urat');
         $z = CekPasien::all()->where('id', '=', $id)->get('z');
-           
+
            if ($sistolik <= 80) {
                $tekanan_darah_sistolik = "Rendah";
            }
@@ -275,7 +283,7 @@ class AdminCekPasienController extends Controller
            if ($diastolik <= 80) {
                 $tekanan_darah_diastolik = "Rendah";
             }
-           if($diastolik > 80 and $request -> $diastolik <= 110) {
+           if($diastolik > 80 and  $diastolik <= 110) {
                 $tekanan_darah_diastolik = "Sedang";
             }
            if($diastolik > 110) {
@@ -288,7 +296,7 @@ class AdminCekPasienController extends Controller
                 $z2 = $z2 * -1;
             }
 
-        
+
             if ($suhu < 36) {
                 $suhu_tubuh = "Rendah";
             }
@@ -304,9 +312,9 @@ class AdminCekPasienController extends Controller
             if ($z3 < 0) {
                 $z3 = $z3 * -1;
             }
-        
 
-        
+
+
             if ($berat < 30) {
                 $berat_badan = "Ringan";
             }
@@ -322,7 +330,7 @@ class AdminCekPasienController extends Controller
             if ($z4 < 0) {
                 $z4 = $z4 * -1;
             }
-            
+
             if ($tinggi < 130) {
                 $tinggi_badan = "Pendek";
             }
@@ -333,7 +341,7 @@ class AdminCekPasienController extends Controller
                 $tinggi_badan = "Tinggi";
             }
 
-        
+
             if ($koles < 36) {
                 $kolesterol = "Baik";
             }
@@ -349,9 +357,9 @@ class AdminCekPasienController extends Controller
             if ($z5 < 0) {
                 $z5 = $z5 * -1;
             }
-        
 
-        
+
+
             if ($asam < 3.5) {
                 $asam_urat = "Rendah";
             }
@@ -367,13 +375,13 @@ class AdminCekPasienController extends Controller
             if ($z6 < 0) {
                 $z6 = $z6 * -1;
             }
-        
+
 
         $ztotal = ($a1*$z1 + $a2*$z2 + $a3*$z3 + $a4*$z4 + $a5*$z5 + $a6*$z6 /*+ $a7*$z7*/)/($a1 + $a2 + $a3 + $a4 + $a5 + $a6 /*+ $a7*/);
-        
 
-        return view('dashboard.cekpasien.indexDetail', ['cekPasien' => $cekPasien, 
-                                                        'riwayat_penyakit' => $riwayat_penyakit, 
+
+        return view('dashboard.cekpasien.indexDetail', ['cekPasien' => $cekPasien,
+                                                        'riwayat_penyakit' => $riwayat_penyakit,
                                                         'tekanan_darah_sistolik' => $tekanan_darah_sistolik,
                                                         'tekanan_darah_diastolik' => $tekanan_darah_diastolik,
                                                         'suhu_tubuh' => $suhu_tubuh,

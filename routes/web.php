@@ -14,23 +14,30 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('dashboard.layouts.index');
+    return view('auth.login');
 });
 
 Auth::routes();
-
-Route::resource('dashboard/petugas', 'AdminPetugasController', [
+Route::resource('login-1', 'daftarController', [
     'names' => [
-        'index' => 'dashboard.petugas.index',
-        'create' => 'dashboard.petugas.create',
-        'edit' => 'dashboard.petugas.edit',
-        'store' => 'dashboard.petugas.store',
-        'update' => 'dashboard.petugas.update',
-        'destroy' => 'dashboard.petugas.destroy',
+        'store' => 'daftar.store',
         // etc...
     ]
 ]);
 
+Route::middleware('auth')->group(function (){
+
+    Route::resource('dashboard/petugas', 'AdminPetugasController', [
+        'names' => [
+            'index' => 'dashboard.petugas.index',
+            'create' => 'dashboard.petugas.create',
+            'edit' => 'dashboard.petugas.edit',
+            'store' => 'dashboard.petugas.store',
+            'update' => 'dashboard.petugas.update',
+            'destroy' => 'dashboard.petugas.destroy',
+            // etc...
+        ]
+    ]);
 Route::resource('dashboard/pasien', 'AdminPasienController', [
     'names' => [
         'index' => 'dashboard.pasien.index',
@@ -67,3 +74,4 @@ Route::resource('dashboard/cek-pasien', 'AdminCekPasienController', [
 ]);
 
 Route::get('/dashboard/cek-pasien-detail/{id}', 'AdminCekPasienController@indexDetail')->name('cekpasien.indexDetail');
+});

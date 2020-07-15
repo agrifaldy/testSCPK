@@ -4,20 +4,33 @@ namespace App\Http\Controllers;
 
 use App\Penyakit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AdminPenyakitController extends Controller
 {
     //
     public function index()
     {
-        $penyakit = Penyakit::all();
-        return view('dashboard.penyakit.index', compact('penyakit'));
+        $user = Auth::user();
+
+        if ($user) {
+            $penyakit = Penyakit::all();
+            return view('dashboard.penyakit.index', compact('penyakit'));
+        }
+        return view('auth.login');
+
     }
 
     public function create()
     {
         //
-        return view('dashboard.penyakit.create');
+        $user = Auth::user();
+
+        if ($user) {
+            return view('dashboard.penyakit.create');
+        }
+        return view('auth.login');
+
     }
 
     public function store(Request $request)
