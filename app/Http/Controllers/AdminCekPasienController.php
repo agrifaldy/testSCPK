@@ -198,9 +198,12 @@ class AdminCekPasienController extends Controller
 //            }
 //        }
 
-        $ztotal = ($a1*$z1 + $a2*$z2 + $a3*$z3 + $a4*$z4 + $a5*$z5 + $a6*$z6 /*+ $a7*$z7*/)/($a1 + $a2 + $a3 + $a4 + $a5 + $a6 /*+ $a7*/);
+        $ztotal = ($a1*$z1 + $a2*$z2 + $a3*$z3 + $a4*$z4 + (($a5*$z5)+30) + $a6*$z6 /*+ $a7*$z7*/)/($a1 + $a2 + $a3 + $a4 + $a5 + $a6 /*+ $a7*/);
 
         //dd($ztotal);
+        if ($ztotal < 0) {
+            $ztotal = $ztotal*(-1);
+        }
 
         if ($ztotal < 145.59588394062 ) {
             CekPasien::create(['result_pasien' => 'Diberi pengobatan',
@@ -255,16 +258,27 @@ class AdminCekPasienController extends Controller
         $id_unik = $cekPasien -> id_uniq;
         $riwayat_penyakit = CekPasienRiwayatPenyakit::all()->where('cek_pasien_id' ,'=', $id_unik);
 
-        $sistolik = CekPasien::all()->where('id', '=', $id)->get('tekanan_darah_sistolik');
-        $diastolik = CekPasien::all()->where('id', '=', $id)->get('tekanan_darah_diastolik');
-        $suhu = CekPasien::all()->where('id', '=', $id)->get('suhu_tubuh');
-        $berat = CekPasien::all()->where('id', '=', $id)->get('berat_badan');
-        $tinggi = CekPasien::all()->where('id', '=', $id)->get('tinggi_badan');
-        $koles = CekPasien::all()->where('id', '=', $id)->get('kolesterol');
-        $asam = CekPasien::all()->where('id', '=', $id)->get('asam_urat');
-        $z = CekPasien::all()->where('id', '=', $id)->get('z');
+        $sistolik = $cekPasien -> tekanan_darah_sistolik;
+        $diastolik = $cekPasien -> tekanan_darah_diastolik;
+        $suhu = $cekPasien -> suhu_tubuh;
+        $berat = $cekPasien -> berat_badan;
+        $tinggi = $cekPasien -> tinggi_badan;
+        $koles = $cekPasien -> kolesterol;
+        $asam = $cekPasien -> asam_urat;
+        $z = $cekPasien -> z;
+
+        $tekanan_darah_sistolik = "-";
+        $tekanan_darah_diastolik = "-";
+        $suhu_tubuh = "-";
+        $tinggi_badan = "-";
+        $berat_badan = "-";
+        $kolesterol = "-";
+        $asam_urat = "-";
+
+
 
         if ($sistolik) {
+            $tekanan_darah_sistolik = "-";
             if ($sistolik <= 120) {
                 $tekanan_darah_sistolik = "Rendah";
             }
@@ -348,12 +362,14 @@ class AdminCekPasienController extends Controller
             }
         }
 
+
+
         return view('dashboard.cekpasien.indexDetail', compact('cekPasien',
                                                             'riwayat_penyakit',
-                                                                'sistolik',
-                                                                'diastolik',
-                                                                'suhu',
-                                                                'tinggi',
+                                                                'tekanan_darah_sistolik',
+                                                                'tekanan_darah_diastolik',
+                                                                'suhu_tubuh',
+                                                                'tinggi_badan',
                                                                 'berat_badan' ,
                                                                 'kolesterol' ,
                                                                 'asam_urat' ,
