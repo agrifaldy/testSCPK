@@ -12,6 +12,7 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
 
 class AdminCekPasienController extends Controller
 {
@@ -56,6 +57,8 @@ class AdminCekPasienController extends Controller
     {
         $unik = CekPasien::all();
 
+
+
         foreach($unik as $h) {
             if ($h -> id_uniq == $request -> id_uniq) {
                 return redirect()->route('dashboard.cekpasien.create');
@@ -83,10 +86,10 @@ class AdminCekPasienController extends Controller
            if ($request -> tekanan_darah_sistolik <= 120) {
                $tekanan_darah_sistolik = "Rendah";
            }
-           if($request -> tekanan_darah_sistolik > 120 and $request -> tekanan_darah_sistolik <= 180) {
+           if($request -> tekanan_darah_sistolik > 120 and $request -> tekanan_darah_sistolik < 180) {
                $tekanan_darah_sistolik = "Sedang";
            }
-           if($request -> tekanan_darah_sistolik > 180) {
+           if($request -> tekanan_darah_sistolik >= 180) {
                $tekanan_darah_sistolik = "Tinggi";
            }
            $x1 = $request->tekanan_darah_sistolik;
@@ -99,10 +102,10 @@ class AdminCekPasienController extends Controller
             if ($request -> tekanan_darah_diastolik <= 80) {
                 $tekanan_darah_diastolik = "Rendah";
             }
-            if($request -> tekanan_darah_diastolik > 80 and $request -> tekanan_darah_diastolik <= 110) {
+            if($request -> tekanan_darah_diastolik > 80 and $request -> tekanan_darah_diastolik < 110) {
                 $tekanan_darah_diastolik = "Sedang";
             }
-            if($request -> tekanan_darah_diastolik > 110) {
+            if($request -> tekanan_darah_diastolik >= 110) {
                 $tekanan_darah_diastolik = "Tinggi";
             }
             $x2 = $request->tekanan_darah_diastolik;
@@ -174,6 +177,8 @@ class AdminCekPasienController extends Controller
 
         }
 
+
+
 //        if ($jumlah) {
 //            if ($jumlah == 0) {
 //                $riwayat_penyakit = "Sehat";
@@ -198,14 +203,40 @@ class AdminCekPasienController extends Controller
 //            }
 //        }
 
-        $ztotal = ($a1*$z1 + $a2*$z2 + $a3*$z3 + $a4*$z4 + (($a5*$z5)+30) + $a6*$z6 /*+ $a7*$z7*/)/($a1 + $a2 + $a3 + $a4 + $a5 + $a6 /*+ $a7*/);
+        $ztotal = ($a1*$z1 + $a2*$z2 +  (($a5*$z5)) + $a6*$z6 /*+ $a7*$z7*/)/($a1 + $a2 + $a5 + $a6 /*+ $a7*/);
 
         //dd($ztotal);
         if ($ztotal < 0) {
             $ztotal = $ztotal*(-1);
         }
 
-        if ($ztotal < 145.59588394062 ) {
+        if ($request-> tekanan_darah_sistolik >= 180 and $request-> tekanan_darah_diastolik >= 110 and $request-> suhu_tubuh >= 37.5 and $request-> berat_badan >= 80 and $request-> kolesterol >= 239  and $request-> asam_urat >= 7) {
+            CekPasien::create(['result_pasien' => 'Perlu dirujuk',
+                'pasien_id' => $request->pasien_id,
+                'tekanan_darah_sistolik' => $request->tekanan_darah_sistolik,
+                'tekanan_darah_diastolik' => $request->tekanan_darah_diastolik,
+                'suhu_tubuh' => $request->suhu_tubuh,
+                'berat_badan' => $request->berat_badan,
+                'tinggi_badan' => $request->tinggi_badan,
+                'kolesterol' => $request->kolesterol,
+                'asam_urat' => $request->asam_urat,
+                'id_uniq' => $request->id_uniq,
+                'z' => $ztotal]);
+        }
+        else if ($request-> kolesterol >= 239  or $request-> asam_urat >= 7) {
+            CekPasien::create(['result_pasien' => 'Perlu dirujuk',
+                'pasien_id' => $request->pasien_id,
+                'tekanan_darah_sistolik' => $request->tekanan_darah_sistolik,
+                'tekanan_darah_diastolik' => $request->tekanan_darah_diastolik,
+                'suhu_tubuh' => $request->suhu_tubuh,
+                'berat_badan' => $request->berat_badan,
+                'tinggi_badan' => $request->tinggi_badan,
+                'kolesterol' => $request->kolesterol,
+                'asam_urat' => $request->asam_urat,
+                'id_uniq' => $request->id_uniq,
+                'z' => $ztotal]);
+        }
+        else {
             CekPasien::create(['result_pasien' => 'Diberi pengobatan',
                 'pasien_id' => $request->pasien_id,
                 'tekanan_darah_sistolik' => $request->tekanan_darah_sistolik,
@@ -217,19 +248,33 @@ class AdminCekPasienController extends Controller
                 'asam_urat' => $request->asam_urat,
                 'id_uniq' => $request->id_uniq,
                 'z' => $ztotal]);
-        }else if ($ztotal >= 145.59588394062 ) {
-        CekPasien::create(['result_pasien' => 'Perlu dirujuk',
-            'pasien_id' => $request->pasien_id,
-            'tekanan_darah_sistolik' => $request->tekanan_darah_sistolik,
-            'tekanan_darah_diastolik' => $request->tekanan_darah_diastolik,
-            'suhu_tubuh' => $request->suhu_tubuh,
-            'berat_badan' => $request->berat_badan,
-            'tinggi_badan' => $request->tinggi_badan,
-            'kolesterol' => $request->kolesterol,
-            'asam_urat' => $request->asam_urat,
-            'id_uniq' => $request->id_uniq,
-            'z' => $ztotal]);
-         }
+        }
+
+//        if ($ztotal < 145.59588394062 ) {
+//            CekPasien::create(['result_pasien' => 'Diberi pengobatan',
+//                'pasien_id' => $request->pasien_id,
+//                'tekanan_darah_sistolik' => $request->tekanan_darah_sistolik,
+//                'tekanan_darah_diastolik' => $request->tekanan_darah_diastolik,
+//                'suhu_tubuh' => $request->suhu_tubuh,
+//                'berat_badan' => $request->berat_badan,
+//                'tinggi_badan' => $request->tinggi_badan,
+//                'kolesterol' => $request->kolesterol,
+//                'asam_urat' => $request->asam_urat,
+//                'id_uniq' => $request->id_uniq,
+//                'z' => $ztotal]);
+//        }else if ($ztotal >= 145.59588394062 ) {
+//        CekPasien::create(['result_pasien' => 'Perlu dirujuk',
+//            'pasien_id' => $request->pasien_id,
+//            'tekanan_darah_sistolik' => $request->tekanan_darah_sistolik,
+//            'tekanan_darah_diastolik' => $request->tekanan_darah_diastolik,
+//            'suhu_tubuh' => $request->suhu_tubuh,
+//            'berat_badan' => $request->berat_badan,
+//            'tinggi_badan' => $request->tinggi_badan,
+//            'kolesterol' => $request->kolesterol,
+//            'asam_urat' => $request->asam_urat,
+//            'id_uniq' => $request->id_uniq,
+//            'z' => $ztotal]);
+//         }
         /**else  {
             CekPasien::create(['result_pasien' => 'Perlu dirujuk',
                 'pasien_id' => $request->pasien_id,
@@ -246,9 +291,12 @@ class AdminCekPasienController extends Controller
 
 
 
+        $detail = CekPasien::all()->where('pasien_id', '=', $id)->pluck('id')->all();
+        foreach ($detail as $d) {
+            $redirect = "http://127.0.0.1:8000/dashboard/cek-pasien-detail/$d";
+        }
 
-
-        return redirect()->route('dashboard.cekpasien.index')->withSuccess('saved');
+        return Redirect::to($redirect);
     }
 
     public function indexDetail($id) {
